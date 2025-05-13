@@ -1,6 +1,7 @@
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -8,36 +9,38 @@ public class GraphParser {
 
     public static Graph parseGraph(String filename) throws IOException {
         Graph graph = new Graph();
-        BufferedReader reader = new BufferedReader(new FileReader(filename));
-        String line = reader.readLine();
 
-        String[] nodeIds = line.split(";");
+        try (BufferedReader reader = new BufferedReader(new FileReader(filename))) {
+            reader.readLine();
 
-        Map<Integer, Node> nodeMap = new HashMap<>();
-        for (int i = 0; i < nodeIds.length; i++) {
-            Node node = new Node();
-            node.setIndex(i);
-            graph.addNode(node);
-            nodeMap.put(i, node);
+            String line = reader.readLine();
+            String[] nodeIds = line.split(";");
+
+            Map<Integer, Node> nodeMap = new HashMap<>();
+            for (int i = 0; i < nodeIds.length; i++) {
+                Node node = new Node();
+                node.setIndex(i);
+                graph.addNode(node);
+                nodeMap.put(i, node);
+            }
+
+            reader.readLine();
+
+            String connectionsTemplate = reader.readLine();
+
+            line = reader.readLine();
+            if (line != null) {
+                processConnections(line, connectionsTemplate, nodeMap);
+            }
+
+
+            for (Node node : graph.nodes) {
+                node.setNum_connections();
+            }
+
+            return graph;
         }
-
-        String connectionsTemplate = reader.readLine();
-
-        line = reader.readLine();
-        if (line != null) {
-            processConnections(line, connectionsTemplate, nodeMap);
-        }
-
-
-        for (Node node : graph.nodes) {
-            node.setNum_connections();
-        }
-
-        graph.setNum_nodes();
-        return graph;
     }
-
-
     private static void processConnections(String indexesLine, String connectionsLine, Map<Integer, Node> nodeMap) {
         String[] indexes = indexesLine.split(";");
         String[] connections = connectionsLine.split(";");
@@ -64,7 +67,6 @@ public class GraphParser {
             for (int i = 0; i < endIdx - beginIdx - 1 && connectionPtr < connections.length; i++) {
                 int targetIdx = Integer.parseInt(connections[connectionPtr++]);
 
-
                 if (!sourceNode.connections.contains(targetIdx)) {
                     sourceNode.addConnection(targetIdx);
                 }
@@ -83,5 +85,4 @@ public class GraphParser {
             }
         }
     }
-
 }

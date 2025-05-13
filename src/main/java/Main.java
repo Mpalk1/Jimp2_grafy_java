@@ -1,8 +1,9 @@
 import javax.swing.*;
 import java.awt.*;
+import java.io.IOException;
 
 public class Main {
-    public static void main(String[] args){
+    public static void main(String[] args) throws IOException {
 
         JFrame window = new JFrame("Jimp2 Grafy");
         window.setResizable(false);
@@ -10,14 +11,9 @@ public class Main {
         window.setSize(1600, 1000);
         window.setLocationRelativeTo(null);
 
-        Graph graph = new Graph();
-        for(int i = 0; i < 5; i++){
-            graph.addNode(new Node());
-            graph.nodes.get(i).addConnection(1, 2, 3, 4, 5);
-            graph.nodes.get(i).setIndex(i);
-            graph.nodes.get(i).setNum_connections();
-        }
+        Graph graph = GraphParser.parseGraph("src/main/resources/graf.csrrg");
         System.out.println(graph);
+
         //window.setVisible(true); // to zawsze na koncu
     }
 }

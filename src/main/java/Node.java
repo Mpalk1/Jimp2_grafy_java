@@ -12,12 +12,16 @@ public class Node {
         this.connections = new ArrayList<>();
     }
 
-    public void addConnection(int node_index){ // dodawanie 1 polaczenia
-        this.connections.add(node_index);
+    public void addConnection(int node_index){
+        if (!this.connections.contains(node_index)) {
+            this.connections.add(node_index);
+        }
     }
-    public void addConnection(int... node_index){ //dodawanie wielu polaczen
+    public void addConnection(int... node_index){
         for(int index: node_index){
-            this.connections.add(index);
+            if (!this.connections.contains(index)) {
+                this.connections.add(index);
+            }
         }
     }
     public void setNum_connections(){
@@ -41,10 +45,7 @@ public class Node {
 
     @Override
     public String toString() {
-        String connectionsString = connections.stream()
-                .map(String::valueOf)
-                .collect(Collectors.joining(" "));
-
+        String connectionsString = connections.stream().map(String::valueOf).collect(Collectors.joining(" "));
         return "Wezel: " + this.index + "(" + this.num_connections + ") polaczenia: " + connectionsString + "\n";
     }
 

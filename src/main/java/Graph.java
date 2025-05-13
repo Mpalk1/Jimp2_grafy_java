@@ -2,18 +2,22 @@ import java.util.ArrayList;
 
 public class Graph {
     ArrayList<Node> nodes;
-    private int num_nodes;
+    private int num_nodes; // ilosc wezlow
 
     public Graph(){
-        nodes = new ArrayList<>();
+        this.nodes = new ArrayList<>();
     }
 
     public void addNode(Node node){
         this.nodes.add(node);
     }
 
-    public void calculateNum_nodes(){
+    public void setNum_nodes(){
         this.num_nodes = nodes.size();
+    }
+
+    public int getNum_nodes(){
+        return this.num_nodes;
     }
 
     @Override

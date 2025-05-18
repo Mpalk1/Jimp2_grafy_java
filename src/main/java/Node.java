@@ -46,7 +46,7 @@ public class Node {
     @Override
     public String toString() {
         String connectionsString = connections.stream().map(String::valueOf).collect(Collectors.joining(" "));
-        return "Wezel: " + this.index + "(" + this.num_connections + ") polaczenia: " + connectionsString + "\n";
+        return "Wezel: " + this.index + "(" + this.num_connections + ") [podgraf " + this.subgraph + "], polaczenia: " + connectionsString + "\n";
     }
 
 

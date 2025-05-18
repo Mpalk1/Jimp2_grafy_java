@@ -11,9 +11,11 @@ public class Main {
         window.setSize(1600, 1000);
         window.setLocationRelativeTo(null);
 
-        Graph graph = GraphParser.parseGraph("src/main/resources/graf6.csrrg");
+        //Graph graph = GraphParser.parseGraph("src/main/resources/graf.csrrg");
+        Graph graph = GraphParser.parseGraphWithSubgraphs("src/main/resources/out.csrrg");
+        System.out.println(graph.getNum_nodes());
         System.out.println(graph);
 
-        //window.setVisible(true); // to zawsze na koncu
+        //window.setVisible(true);
     }
 }

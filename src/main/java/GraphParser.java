@@ -12,10 +12,13 @@ public class GraphParser {
         Graph graph = new Graph();
 
         try (BufferedReader reader = new BufferedReader(new FileReader(filename))) {
-            reader.readLine(); // 1 linia skip narazie
+            graph.setMaxNodesInRow(Integer.parseInt(reader.readLine())); // 1 linia skip narazie
 
             String line = reader.readLine();
             String[] nodeIds = line.split(";");
+
+            String[] rowStartIndicesStr = reader.readLine().split(";");
+            List<Integer> rowStartIndices = Arrays.stream(rowStartIndicesStr).map(String::trim).map(Integer::parseInt).toList();
 
             Map<Integer, Node> nodeMap = new HashMap<>();
             for (int i = 0; i < nodeIds.length; i++) {
@@ -24,8 +27,6 @@ public class GraphParser {
                 graph.addNode(node);
                 nodeMap.put(i, node);
             }
-
-            reader.readLine();
 
             String connectionsTemplate = reader.readLine(); // linia 4
 
@@ -38,7 +39,25 @@ public class GraphParser {
                 node.setNum_connections();
             }
 
+            int rows = 0;
+            for(int i = 0; i < rowStartIndices.size() - 1; i++){
+                rows++;
+                if(Objects.equals(rowStartIndices.get(i), rowStartIndices.get(i + 1))){
+                    rows++;
+                }
+            }
 
+            int cols = graph.getMaxNodesInRow();
+            graph.setPositionMatrix(rows, cols);
+
+            int currentRow = 0;
+            for (int i = 0; i < nodeIds.length; i++) {
+                while (currentRow + 1 < rowStartIndices.size() && i >= rowStartIndices.get(currentRow + 1)) {
+                    currentRow++;
+                }
+                int col = Integer.parseInt(nodeIds[i].trim());
+                graph.setNodePosition(currentRow, col, i);
+            }
 
             return graph;
         }
@@ -59,7 +78,6 @@ public class GraphParser {
             } else {
                 endIdx = Integer.MAX_VALUE;
             }
-
             if (connectionPtr >= connections.length) {
                 break;
             }
@@ -68,7 +86,6 @@ public class GraphParser {
             Node sourceNode = nodeMap.get(nodeIdx);
 
             if (sourceNode == null) {
-
                 beginIdx = endIdx;
                 indexPtr++;
                 continue;
@@ -76,11 +93,9 @@ public class GraphParser {
 
             for (int i = 0; i < endIdx - beginIdx - 1 && connectionPtr < connections.length; i++) {
                 int targetIdx = Integer.parseInt(connections[connectionPtr++]);
-
                 if (!sourceNode.connections.contains(targetIdx)) {
                     sourceNode.addConnection(targetIdx);
                 }
-
                 Node targetNode = nodeMap.get(targetIdx);
                 if (targetNode != null && !targetNode.connections.contains(nodeIdx)) {
                     targetNode.addConnection(nodeIdx);
@@ -95,6 +110,7 @@ public class GraphParser {
             }
         }
     }
+
     public static Graph parseGraphWithSubgraphs(String filename) throws IOException { // Parsowanie plikow tekstowych od 2 zespolu
         Graph graph = new Graph();
         List<String> lines = Files.readAllLines(Paths.get(filename));
@@ -116,7 +132,6 @@ public class GraphParser {
         for (int lineIdx = 4; lineIdx < lines.size(); lineIdx++) {
             String line = lines.get(lineIdx).trim();
             if (line.isEmpty()) continue;
-
             String[] pointers = line.split(";");
             for (String ptr : pointers) {
                 try {
@@ -140,9 +155,7 @@ public class GraphParser {
 
             for (int i = 0; i < pointersInLine; i++) {
                 int startIdx = allPointers.get(currentPointerIdx);
-                int endIdx = (currentPointerIdx + 1 < allPointers.size())
-                        ? allPointers.get(currentPointerIdx + 1)
-                        : allNodes.length;
+                int endIdx = (currentPointerIdx + 1 < allPointers.size()) ? allPointers.get(currentPointerIdx + 1): allNodes.length;
 
                 if (startIdx >= allNodes.length) {
                     currentPointerIdx++;
@@ -158,34 +171,52 @@ public class GraphParser {
 
                 sourceNode.setSubgraph(subgraphId);
 
-
                 for (int j = startIdx + 1; j < endIdx && j < allNodes.length; j++) {
                     int targetId = Integer.parseInt(allNodes[j].trim());
                     Node targetNode = nodeMap.get(targetId);
                     if (targetNode == null) continue;
-
-
                     if (!sourceNode.connections.contains(targetId)) {
                         sourceNode.addConnection(targetId);
                     }
                     if (!targetNode.connections.contains(sourceId)) {
                         targetNode.addConnection(sourceId);
                     }
-
                     targetNode.setSubgraph(subgraphId);
                 }
-
                 currentPointerIdx++;
             }
-
             subgraphId++;
         }
 
         for (Node node : graph.nodes) {
             node.setNum_connections();
         }
-
         graph.setNum_nodes();
+
+        graph.setMaxNodesInRow(Integer.parseInt(lines.getFirst()));
+        String[] nodeIds = lines.get(1).split(";");
+        String[] rowStartIndicesStr = lines.get(2).split(";");
+        List<Integer> rowStartIndices = Arrays.stream(rowStartIndicesStr).map(String::trim).map(Integer::parseInt).toList();
+
+        int rows = 0;
+        for(int i = 0; i < rowStartIndices.size() - 1; i++){
+            rows++;
+            if(Objects.equals(rowStartIndices.get(i), rowStartIndices.get(i + 1))){
+                rows++;
+            }
+        }
+        int cols = graph.getMaxNodesInRow();
+        graph.setPositionMatrix(rows, cols);
+
+        int currentRow = 0;
+        for (int i = 0; i < nodeIds.length; i++) {
+            while (currentRow + 1 < rowStartIndices.size() && i >= rowStartIndices.get(currentRow + 1)) {
+                currentRow++;
+            }
+            int col = Integer.parseInt(nodeIds[i].trim());
+            graph.setNodePosition(currentRow, col, i);
+        }
+
         return graph;
     }
 }

@@ -4,15 +4,13 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class GraphParser {
 
-    public static Graph parseGraph(String filename) throws IOException { // do plikow csrrg
-        Graph graph = new Graph();
+    public static void parseGraph(String filename, Graph graph) throws IOException { // do plikow csrrg
 
         try (BufferedReader reader = new BufferedReader(new FileReader(filename))) {
-            graph.setMaxNodesInRow(Integer.parseInt(reader.readLine())); // 1 linia skip narazie
+            graph.setMaxNodesInRow(Integer.parseInt(reader.readLine()));
 
             String line = reader.readLine();
             String[] nodeIds = line.split(";");
@@ -40,9 +38,9 @@ public class GraphParser {
             }
 
             int rows = 0;
-            for(int i = 0; i < rowStartIndices.size() - 1; i++){
+            for (int i = 0; i < rowStartIndices.size() - 1; i++) {
                 rows++;
-                if(Objects.equals(rowStartIndices.get(i), rowStartIndices.get(i + 1))){
+                if (Objects.equals(rowStartIndices.get(i), rowStartIndices.get(i + 1))) {
                     rows++;
                 }
             }
@@ -58,8 +56,7 @@ public class GraphParser {
                 int col = Integer.parseInt(nodeIds[i].trim());
                 graph.setNodePosition(currentRow, col, i);
             }
-
-            return graph;
+            graph.setNum_subgraphs(0);
         }
     }
 
@@ -111,8 +108,7 @@ public class GraphParser {
         }
     }
 
-    public static Graph parseGraphWithSubgraphs(String filename) throws IOException { // Parsowanie plikow tekstowych od 2 zespolu
-        Graph graph = new Graph();
+    public static void parseGraphWithSubgraphs(String filename, Graph graph) throws IOException { // Parsowanie plikow tekstowych od 2 zespolu
         List<String> lines = Files.readAllLines(Paths.get(filename));
 
         String[] allNodes = lines.get(3).split(";");
@@ -155,7 +151,7 @@ public class GraphParser {
 
             for (int i = 0; i < pointersInLine; i++) {
                 int startIdx = allPointers.get(currentPointerIdx);
-                int endIdx = (currentPointerIdx + 1 < allPointers.size()) ? allPointers.get(currentPointerIdx + 1): allNodes.length;
+                int endIdx = (currentPointerIdx + 1 < allPointers.size()) ? allPointers.get(currentPointerIdx + 1) : allNodes.length;
 
                 if (startIdx >= allNodes.length) {
                     currentPointerIdx++;
@@ -199,9 +195,9 @@ public class GraphParser {
         List<Integer> rowStartIndices = Arrays.stream(rowStartIndicesStr).map(String::trim).map(Integer::parseInt).toList();
 
         int rows = 0;
-        for(int i = 0; i < rowStartIndices.size() - 1; i++){
+        for (int i = 0; i < rowStartIndices.size() - 1; i++) {
             rows++;
-            if(Objects.equals(rowStartIndices.get(i), rowStartIndices.get(i + 1))){
+            if (Objects.equals(rowStartIndices.get(i), rowStartIndices.get(i + 1))) {
                 rows++;
             }
         }
@@ -216,7 +212,6 @@ public class GraphParser {
             int col = Integer.parseInt(nodeIds[i].trim());
             graph.setNodePosition(currentRow, col, i);
         }
-
-        return graph;
+        graph.setNum_subgraphs(lines.size() - 4);
     }
 }

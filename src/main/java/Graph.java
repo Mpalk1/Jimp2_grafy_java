@@ -5,26 +5,34 @@ public class Graph {
     private int num_nodes; // ilosc wezlow
     private int[][] positionMatrix; // macierz pozycji węzłów
     private int maxNodesInRow; // maksymalna liczba węzłów w wierszu
+    private int num_subgraphs;
 
-    public Graph(){
+    public Graph() {
         this.nodes = new ArrayList<>();
     }
 
-    public void addNode(Node node){
+    public int getNum_subgraphs() {
+        return this.num_subgraphs;
+    }
+
+    public void setNum_subgraphs(int sg) {
+        this.num_subgraphs = sg;
+    }
+
+    public void addNode(Node node) {
         this.nodes.add(node);
     }
 
-    public void setNum_nodes(){
+    public void setNum_nodes() {
         this.num_nodes = nodes.size();
     }
 
-    public int getNum_nodes(){
+    public int getNum_nodes() {
         return this.num_nodes;
     }
 
     public void setPositionMatrix(int rows, int cols) {
         this.positionMatrix = new int[rows][cols];
-        // Inicjalizacja wszystkich pozycji jako puste (-1)
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < cols; j++) {
                 positionMatrix[i][j] = -1;
@@ -42,7 +50,7 @@ public class Graph {
         if (row >= 0 && row < positionMatrix.length && col >= 0 && col < positionMatrix[0].length) {
             return positionMatrix[row][col];
         }
-        return -1; // -1 oznacza brak węzła na tej pozycji
+        return -1;
     }
 
     public void setMaxNodesInRow(int max) {
@@ -57,7 +65,6 @@ public class Graph {
         return this.positionMatrix;
     }
 
-    // Metoda do wyświetlania macierzy pozycji
     public String displayPositionMatrix() {
         if (positionMatrix == null) {
             return "Macierz pozycji nie została zainicjalizowana";
@@ -67,7 +74,7 @@ public class Graph {
         for (int[] matrix : positionMatrix) {
             for (int i : matrix) {
                 if (i == -1) {
-                    sb.append("-1 "); // puste miejsce
+                    sb.append("-1 ");
                 } else {
                     sb.append(i).append(" ");
                 }
@@ -75,6 +82,39 @@ public class Graph {
             sb.append("\n");
         }
         return sb.toString();
+    }
+
+    public ArrayList<Node> getNodesInSubgraph(int subgraphIndex) {
+        ArrayList<Node> result = new ArrayList<>();
+        for (Node node : nodes) {
+            if (node.getSubgraph() == subgraphIndex) {
+                result.add(node);
+            }
+        }
+        return result;
+    }
+
+    public Node getNodeByIndex(int index) {
+        for (Node node : nodes) {
+            if (node.getIndex() == index) return node;
+        }
+        return null;
+    }
+
+    public int[] getNodePosition(int nodeIndex) {
+        for (int row = 0; row < positionMatrix.length; row++) {
+            for (int col = 0; col < positionMatrix[0].length; col++) {
+                if (positionMatrix[row][col] == nodeIndex) {
+                    return new int[]{row, col};
+                }
+            }
+        }
+        return null;
+    }
+
+    public ArrayList<Integer> getConnections(int nodeIndex) {
+        Node node = getNodeByIndex(nodeIndex);
+        return node != null ? node.connections : new ArrayList<>();
     }
 
     @Override

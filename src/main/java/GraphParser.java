@@ -56,7 +56,7 @@ public class GraphParser {
                 int col = Integer.parseInt(nodeIds[i].trim());
                 graph.setNodePosition(currentRow, col, i);
             }
-            graph.setNum_subgraphs(0);
+            graph.setNum_subgraphs(1);
         }
     }
 

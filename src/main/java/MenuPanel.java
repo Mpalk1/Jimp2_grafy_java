@@ -41,6 +41,16 @@ public class MenuPanel extends JPanel {
         this.add(resetButton);
         this.add(drawGraphButton);
 
+        graphLoader.addActionListener(e -> {
+            File selectedFile = openFileDialog("Select Graph File");
+            if (selectedFile != null) {
+                Main.GraphFile = selectedFile;
+                selectedFileLabel.setText(selectedFile.getName());
+                subGraphLoader.setEnabled(false);
+                drawGraphButton.setEnabled(true);
+            }
+        });
+        
         subGraphLoader.addActionListener(e -> {
             File selectedFile = openFileDialog("Select SubGraph File");
             if (selectedFile != null) {
@@ -54,6 +64,8 @@ public class MenuPanel extends JPanel {
         drawGraphButton.addActionListener(e -> {
             if (Main.SubGraphFile != null) {
                 callback.onFileSelected(Main.SubGraphFile, "SubGraph");
+            } else if (Main.GraphFile != null) {
+                callback.onFileSelected(Main.GraphFile, "Graph");
             }
         });
 

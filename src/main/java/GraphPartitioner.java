@@ -81,6 +81,7 @@ public class GraphPartitioner {
             partQueues[i] = new LinkedList<>();
         }
 
+        // Initial assignment
         for (int p = 0; p < numParts; p++) {
             for (Node node : nodes) {
                 int idx = graph.nodes.indexOf(node);
@@ -98,9 +99,11 @@ public class GraphPartitioner {
         do {
             changed = false;
             for (int p = 0; p < numParts; p++) {
-                if (sizes[p] >= maxSize) continue;
+                if (sizes[p] >= maxSize || partQueues[p].isEmpty()) continue;
 
-                int current = partQueues[p].poll();
+                Integer current = partQueues[p].poll();
+                if (current == null) continue;  // Additional safety check
+
                 Node currentNode = graph.nodes.get(current);
                 for (int neighborIndex : currentNode.connections) {
                     if (!assigned[neighborIndex] && sizes[p] < maxSize) {
@@ -115,6 +118,7 @@ public class GraphPartitioner {
             }
         } while (changed);
 
+        // Assign remaining nodes
         for (Node node : nodes) {
             int idx = graph.nodes.indexOf(node);
             if (!assigned[idx]) {
@@ -123,19 +127,21 @@ public class GraphPartitioner {
 
                 for (int p = 0; p < numParts; p++) {
                     if (sizes[p] >= maxSize) continue;
-                    
+
                     int connections = 0;
                     for (int neighborIndex : node.connections) {
-                        if (graph.getNodeByIndex(neighborIndex).getSubgraph() == p) {
+                        Node neighbor = graph.getNodeByIndex(neighborIndex);
+                        if (neighbor != null && neighbor.getSubgraph() == p) {
                             connections++;
                         }
                     }
-                    if (connections > maxConnections || 
-                        (connections == maxConnections && sizes[p] < sizes[bestPart])) {
+                    if (connections > maxConnections ||
+                            (connections == maxConnections && (bestPart == -1 || sizes[p] < sizes[bestPart]))) {
                         maxConnections = connections;
                         bestPart = p;
                     }
                 }
+
                 if (bestPart == -1) {
                     bestPart = 0;
                     for (int p = 1; p < numParts; p++) {

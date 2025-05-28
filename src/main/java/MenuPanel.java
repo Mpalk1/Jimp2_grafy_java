@@ -5,7 +5,7 @@ import java.io.File;
 
 public class MenuPanel extends JPanel {
     public interface FileSelectionCallback {
-        void onFileSelected(File file, String fileType);
+        void onFileSelected(File file, String fileType, int numParts, int margin);
     }
 
     private final FileSelectionCallback callback;
@@ -13,8 +13,11 @@ public class MenuPanel extends JPanel {
     private JButton subGraphLoader = new JButton("SubGraph File");
     private JLabel selectedFileLabel = new JLabel("null");
     private JButton resetButton = new JButton("Reset");
-    private JButton divideGraphButton = new JButton("Divide");
     private JButton drawGraphButton = new JButton("Draw");
+    private File currentFile;
+    private String currentFileType;
+    private int numParts = 7;
+    private int margin = 40;
 
     public MenuPanel(FileSelectionCallback callback) {
         this.callback = callback;
@@ -26,7 +29,6 @@ public class MenuPanel extends JPanel {
         this.setBackground(Color.LIGHT_GRAY);
         this.setLayout(new FlowLayout(FlowLayout.LEFT, 10, 5));
 
-        divideGraphButton.setEnabled(false);
         drawGraphButton.setEnabled(false);
 
         selectedFileLabel.setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 10));
@@ -42,19 +44,25 @@ public class MenuPanel extends JPanel {
         this.add(drawGraphButton);
 
         graphLoader.addActionListener(e -> {
-            File selectedFile = openFileDialog("Select Graph File");
-            if (selectedFile != null) {
-                Main.GraphFile = selectedFile;
-                selectedFileLabel.setText(selectedFile.getName());
+            GraphSettingsDialog dialog = new GraphSettingsDialog((Frame)SwingUtilities.getWindowAncestor(this));
+            dialog.setVisible(true);
+
+            if (dialog.isConfirmed() && dialog.getSelectedFile() != null) {
+                currentFile = dialog.getSelectedFile();
+                currentFileType = "Graph";
+                selectedFileLabel.setText(currentFile.getName());
                 subGraphLoader.setEnabled(false);
                 drawGraphButton.setEnabled(true);
+                numParts = dialog.getNumParts();
+                margin = dialog.getMargin();
             }
         });
-        
+
         subGraphLoader.addActionListener(e -> {
             File selectedFile = openFileDialog("Select SubGraph File");
             if (selectedFile != null) {
-                Main.SubGraphFile = selectedFile;
+                currentFile = selectedFile;
+                currentFileType = "SubGraph";
                 selectedFileLabel.setText(selectedFile.getName());
                 graphLoader.setEnabled(false);
                 drawGraphButton.setEnabled(true);
@@ -62,10 +70,12 @@ public class MenuPanel extends JPanel {
         });
 
         drawGraphButton.addActionListener(e -> {
-            if (Main.SubGraphFile != null) {
-                callback.onFileSelected(Main.SubGraphFile, "SubGraph");
-            } else if (Main.GraphFile != null) {
-                callback.onFileSelected(Main.GraphFile, "Graph");
+            if (currentFile != null) {
+                if ("Graph".equals(currentFileType)) {
+                    callback.onFileSelected(currentFile, currentFileType, numParts, margin);
+                } else {
+                    callback.onFileSelected(currentFile, currentFileType, 0, 0);
+                }
             }
         });
 
@@ -74,7 +84,9 @@ public class MenuPanel extends JPanel {
             graphLoader.setEnabled(true);
             subGraphLoader.setEnabled(true);
             drawGraphButton.setEnabled(false);
-            Main.SubGraphFile = null;
+            currentFile = null;
+            currentFileType = null;
+            callback.onFileSelected(null, "Reset", 0, 0);
         });
     }
 

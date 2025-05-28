@@ -16,7 +16,7 @@ public class Main {
         System.setOut(new PrintStream(System.out, true, "UTF-8"));
         System.setErr(new PrintStream(System.err, true, "UTF-8"));
         window = new JFrame("Jimp2 Grafy");
-        window.setResizable(false);
+        //window.setResizable(false);
         window.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         window.setExtendedState(JFrame.MAXIMIZED_BOTH);
         window.setLocationRelativeTo(null);
@@ -29,7 +29,7 @@ public class Main {
     }
 
     private static MenuPanel.FileSelectionCallback createFileSelectionCallback() {
-        return (file, fileType) -> {
+        return (file, fileType, numParts, margin) -> {
             try {
                 if (drawingPanel != null) {
                     window.remove(drawingPanel);
@@ -40,13 +40,11 @@ public class Main {
                     System.out.println("Loaded subgraphs: " + graph.getNum_subgraphs());
                 } else if ("Graph".equals(fileType)) {
                     GraphParser.parseGraph(file.getAbsolutePath(), graph);
-                    int numParts = 7;
-                    int margin = 40;
                     GraphPartitioner.Options options = new GraphPartitioner.Options();
                     options.verbose = true;
                     options.force = true;
                     graph.setNum_nodes();
-                    
+
                     if (GraphPartitioner.makeSubgraphs(graph, numParts, margin, options) && options.verbose) {
                         System.out.println("\nGraf podzielony.");
                         for (int i = 0; i < numParts; i++) {
@@ -61,6 +59,9 @@ public class Main {
                     } else if (options.verbose){
                         System.out.println("\nGraf nie został podzielony.");
                     }
+                } else if ("Reset".equals(fileType)) {
+                    // Reset the graph to its initial state
+                    graph = new Graph();
                 }
 
                 drawingPanel = new DrawingPanel(graph);

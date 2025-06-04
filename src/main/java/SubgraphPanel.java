@@ -75,8 +75,8 @@ public class SubgraphPanel extends JPanel {
         resetButton = new JButton("Reset View");
         resetButton.setBounds(10, 10, 100, 30);
         resetButton.addActionListener(e -> resetView());
-        resetButton.setVisible(false); // Initially hidden
-        add(resetButton);
+        //resetButton.setVisible(false);
+        //add(resetButton);
     }
 
 

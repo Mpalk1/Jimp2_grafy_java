@@ -262,15 +262,9 @@ public class BinaryGraphParser {
                 while (currentRow + 1 < rowStartIndices.size() && i >= rowStartIndices.get(currentRow + 1)) {
                     currentRow++;
                 }
-                int col = nodeIdsInRows.get(i);
-                int nodeIdToPlace = nodeIdsInRows.get(i);
-                if (nodeMap.containsKey(nodeIdToPlace)) {
-                    graph.setNodePosition(currentRow, col, nodeIdToPlace);
-                } else {
-                    System.err.println("Węzeł z nodeIdsInRows nie jest w mapie węzłów");
-                }
+                int col = nodeIdsInRows.get(i); 
+                graph.setNodePosition(currentRow, col, i);
             }
         }
-        System.out.println(graph);
     }
 }

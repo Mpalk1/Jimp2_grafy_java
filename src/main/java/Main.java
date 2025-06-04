@@ -66,7 +66,8 @@ public class Main {
                     // Reset the graph to its initial state
                     graph = new Graph();
                 }
-
+                System.out.println(graph);
+                System.out.println(graph.displayPositionMatrix());
                 drawingPanel = new DrawingPanel(graph);
                 window.add(drawingPanel, BorderLayout.CENTER);
                 window.revalidate();

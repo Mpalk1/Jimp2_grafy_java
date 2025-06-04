@@ -35,7 +35,10 @@ public class Main {
                     window.remove(drawingPanel);
                 }
 
-                if ("SubGraph".equals(fileType)) {
+                if ("SubGraph".equals(fileType) && file.getAbsolutePath().endsWith(".bin")) {
+                    BinaryGraphParser.parseGraphWithSubgraphsBinary(file.getAbsolutePath(), graph);
+                    System.out.println("Loaded subgraphs: " + graph.getNum_subgraphs());
+                } else if ("SubGraph".equals(fileType)) {
                     GraphParser.parseGraphWithSubgraphs(file.getAbsolutePath(), graph);
                     System.out.println("Loaded subgraphs: " + graph.getNum_subgraphs());
                 } else if ("Graph".equals(fileType)) {
